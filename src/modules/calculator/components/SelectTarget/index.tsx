@@ -1,7 +1,11 @@
-import { useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { targetTypeOptions } from "@/calculator/utils/constants";
 import { RadioGroup, Transition } from "@headlessui/react";
-import { CheckBadgeIcon } from "@heroicons/react/24/solid";
+import {
+  CheckBadgeIcon,
+  ChevronDoubleDownIcon,
+  ChevronDoubleUpIcon,
+} from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import SelectList from "../SelectList";
 import { Juz, Surah } from "@/modules/core/QuranCoreData/constant";
@@ -87,12 +91,13 @@ const initialSelectTargetState: SelectTargetState = {
 };
 
 const SelectTarget = () => {
+  const [increaseAnimation, setIncreaseAnimation] = useState(false);
+  const [decreaseAnimation, setDecreaseAnimation] = useState(false);
   const [state, dispatch] = useReducer(
     SelectTargetReducer,
     initialSelectTargetState
   );
   const R = RadioGroup;
-  console.log(state);
 
   const handleSelectedValuesChange = (
     type: string,
@@ -102,11 +107,13 @@ const SelectTarget = () => {
     if (type === "all") return;
     if (type === "juz") {
       if (selected) {
+        setDecreaseAnimation(true);
         dispatch({
           type: SelectTargetActions.DESELECT_JUZ,
           payload: { deselected: value },
         });
       } else {
+        setIncreaseAnimation(true);
         dispatch({
           type: SelectTargetActions.SELECT_JUZ,
           payload: { selected: value },
@@ -115,11 +122,13 @@ const SelectTarget = () => {
     }
     if (type === "surah") {
       if (selected) {
+        setDecreaseAnimation(true);
         dispatch({
           type: SelectTargetActions.DESELECT_SURAH,
           payload: { deselected: value },
         });
       } else {
+        setIncreaseAnimation(true);
         dispatch({
           type: SelectTargetActions.SELECT_SURAH,
           payload: { selected: value },
@@ -127,6 +136,16 @@ const SelectTarget = () => {
       }
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIncreaseAnimation(false);
+      setDecreaseAnimation(false);
+    }, 300);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [increaseAnimation, decreaseAnimation]);
 
   return (
     <div className="mt-6">
@@ -157,17 +176,53 @@ const SelectTarget = () => {
                   )}
                 >
                   <span>{label}</span>
-                  <Transition
-                    show={checked && !selectable}
-                    enter="transition-opacity duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="transition-opacity duration-150"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                  >
-                    <CheckBadgeIcon className="w-5 h-5 text-blue-400" />
-                  </Transition>
+                  <div className="flex items-center justify-center gap-2">
+                    <Transition
+                      show={checked && !selectable}
+                      enter="transition-opacity duration-300"
+                      enterFrom="opacity-0"
+                      enterTo="opacity-100"
+                      leave="transition-opacity duration-150"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <CheckBadgeIcon className="w-5 h-5 text-blue-400" />
+                    </Transition>
+                    <Transition
+                      show={checked && selectable && increaseAnimation}
+                      enter="transition-all duration-150"
+                      enterFrom="opacity-0 transform translate-y-2"
+                      enterTo="opacity-100 transform translate-y-0"
+                      leave="transition-all duration-150"
+                      leaveFrom="opacity-100 transform translate-y-0"
+                      leaveTo="opacity-0 transform -translate-y-2"
+                      appear
+                    >
+                      <ChevronDoubleUpIcon className="w-5 h-5 text-green-600" />
+                    </Transition>
+                    <Transition
+                      show={checked && selectable && decreaseAnimation}
+                      enter="transition-all duration-150"
+                      enterFrom="opacity-0 transform -translate-y-2"
+                      enterTo="opacity-100 transform translate-y-0"
+                      leave="transition-all duration-150"
+                      leaveFrom="opacity-100 transform translate-y-0"
+                      leaveTo="opacity-0 transform translate-y-2"
+                      appear
+                    >
+                      <ChevronDoubleDownIcon className="w-5 h-5 text-red-600" />
+                    </Transition>
+                    {checked && selectable && (
+                      <div className="text-xs">
+                        {value === "juz" && (
+                          <div>{state.selectedJuz.length} Juz</div>
+                        )}
+                        {value === "surah" && (
+                          <div>{state.selectedSurah.length} Surah</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {selectable && (
                   <Transition
