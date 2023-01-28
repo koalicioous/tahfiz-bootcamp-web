@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { targetTypeOptions } from "@/calculator/utils/constants";
 import { RadioGroup, Transition } from "@headlessui/react";
 import {
@@ -24,9 +24,11 @@ type SelectTargetAction = {
 enum SelectTargetActions {
   SELECT_TYPE = "SELECT_TYPE",
   SELECT_ALL_JUZ = "SELECT_ALL_JUZ",
+  DESELECT_ALL_JUZ = "DESELECT_ALL_JUZ",
   SELECT_JUZ = "SELECT_JUZ",
   DESELECT_JUZ = "DESELECT_JUZ",
   SELECT_ALL_SURAH = "SELECT_ALL_SURAH",
+  DESELECT_ALL_SURAH = "DESELECT_ALL_SURAH",
   SELECT_SURAH = "SELECT_SURAH",
   DESELECT_SURAH = "DESELECT_SURAH",
 }
@@ -49,6 +51,11 @@ const SelectTargetReducer = (
         ...state,
         selectedJuz: Juz.map((juz) => juz.id),
       };
+    case SelectTargetActions.DESELECT_ALL_JUZ:
+      return {
+        ...state,
+        selectedJuz: [],
+      };
     case SelectTargetActions.SELECT_JUZ:
       return {
         ...state,
@@ -66,6 +73,11 @@ const SelectTargetReducer = (
       return {
         ...state,
         selectedSurah: Surah.map((surah) => surah.id),
+      };
+    case SelectTargetActions.DESELECT_ALL_SURAH:
+      return {
+        ...state,
+        selectedSurah: [],
       };
     case SelectTargetActions.SELECT_SURAH:
       return {
@@ -98,6 +110,15 @@ const SelectTarget = () => {
     initialSelectTargetState
   );
   const R = RadioGroup;
+  const { selectedType, selectedJuz, selectedSurah } = state;
+
+  const allJuzSelected = useMemo(() => {
+    return selectedJuz.length === Juz.length && selectedType === "juz";
+  }, [selectedType, selectedJuz]);
+
+  const allSurahSelected = useMemo(() => {
+    return selectedSurah.length === Surah.length && selectedType === "surah";
+  }, [selectedType, selectedSurah]);
 
   const handleSelectedValuesChange = (
     type: string,
@@ -137,6 +158,39 @@ const SelectTarget = () => {
     }
   };
 
+  const handleClickBulk = () => {
+    if (selectedType === "juz") {
+      if (allJuzSelected) {
+        setDecreaseAnimation(true);
+        dispatch({
+          type: SelectTargetActions.DESELECT_ALL_JUZ,
+          payload: {},
+        });
+      } else {
+        setIncreaseAnimation(true);
+        dispatch({
+          type: SelectTargetActions.SELECT_ALL_JUZ,
+          payload: {},
+        });
+      }
+    }
+    if (selectedType === "surah") {
+      if (allSurahSelected) {
+        setDecreaseAnimation(true);
+        dispatch({
+          type: SelectTargetActions.DESELECT_ALL_SURAH,
+          payload: {},
+        });
+      } else {
+        setIncreaseAnimation(true);
+        dispatch({
+          type: SelectTargetActions.SELECT_ALL_SURAH,
+          payload: {},
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIncreaseAnimation(false);
@@ -158,13 +212,14 @@ const SelectTarget = () => {
           });
         }}
       >
+        <R.Label>Pilih Target Hafalan:</R.Label>
         {targetTypeOptions.map(({ value, label, selectable = false }) => (
           <R.Option value={value} key={value}>
             {({ checked }) => (
               <div
                 className={clsx(
                   "transition-all border rounded-md mt-2 cursor-pointer hover:shadow text-sm ",
-                  { "border-blue-400 ": checked },
+                  { "border-blue-400 bg-white": checked },
                   { "hover:border-blue-200": !checked }
                 )}
               >
@@ -213,7 +268,7 @@ const SelectTarget = () => {
                       <ChevronDoubleDownIcon className="w-5 h-5 text-red-600" />
                     </Transition>
                     {checked && selectable && (
-                      <div className="text-xs">
+                      <div className="text-xs text-stone-700 font-medium">
                         {value === "juz" && (
                           <div>{state.selectedJuz.length} Juz</div>
                         )}
@@ -224,6 +279,31 @@ const SelectTarget = () => {
                     )}
                   </div>
                 </div>
+                {selectable && checked && (
+                  <div
+                    className="mt-2 px-2 pb-2 border-b bg-white flex items-center gap-1 text-xs cursor-pointer"
+                    role="button"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={
+                        value === "juz" ? allJuzSelected : allSurahSelected
+                      }
+                      id="bulkCheck"
+                      onChange={(e) => {
+                        if (increaseAnimation || decreaseAnimation) {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          return;
+                        }
+                        handleClickBulk();
+                      }}
+                    />
+                    <label htmlFor="bulkCheck" className="cursor-pointer">
+                      Semua {value === "juz" ? "juz" : "surah"}
+                    </label>
+                  </div>
+                )}
                 {selectable && (
                   <Transition
                     show={checked}
