@@ -39,6 +39,42 @@ const SelectTargetReducer = (
         selectedJuz: [],
         selectedSurah: [],
       };
+    //  Juz
+    case SelectTargetActions.SELECT_ALL_JUZ:
+      return {
+        ...state,
+        selectedJuz: Juz.map((juz) => juz.id),
+      };
+    case SelectTargetActions.SELECT_JUZ:
+      return {
+        ...state,
+        selectedJuz: [...state.selectedJuz, action.payload.selected],
+      };
+    case SelectTargetActions.DESELECT_JUZ:
+      return {
+        ...state,
+        selectedJuz: state.selectedJuz.filter(
+          (juz) => juz !== action.payload.deselected
+        ),
+      };
+    //  Surah
+    case SelectTargetActions.SELECT_ALL_SURAH:
+      return {
+        ...state,
+        selectedSurah: Surah.map((surah) => surah.id),
+      };
+    case SelectTargetActions.SELECT_SURAH:
+      return {
+        ...state,
+        selectedSurah: [...state.selectedSurah, action.payload.selected],
+      };
+    case SelectTargetActions.DESELECT_SURAH:
+      return {
+        ...state,
+        selectedSurah: state.selectedSurah.filter(
+          (surah) => surah !== action.payload.deselected
+        ),
+      };
     default:
       return state;
   }
@@ -56,6 +92,41 @@ const SelectTarget = () => {
     initialSelectTargetState
   );
   const R = RadioGroup;
+  console.log(state);
+
+  const handleSelectedValuesChange = (
+    type: string,
+    selected: boolean,
+    value: string | number
+  ) => {
+    if (type === "all") return;
+    if (type === "juz") {
+      if (selected) {
+        dispatch({
+          type: SelectTargetActions.DESELECT_JUZ,
+          payload: { deselected: value },
+        });
+      } else {
+        dispatch({
+          type: SelectTargetActions.SELECT_JUZ,
+          payload: { selected: value },
+        });
+      }
+    }
+    if (type === "surah") {
+      if (selected) {
+        dispatch({
+          type: SelectTargetActions.DESELECT_SURAH,
+          payload: { deselected: value },
+        });
+      } else {
+        dispatch({
+          type: SelectTargetActions.SELECT_SURAH,
+          payload: { selected: value },
+        });
+      }
+    }
+  };
 
   return (
     <div className="mt-6">
@@ -81,7 +152,8 @@ const SelectTarget = () => {
                 <div
                   className={clsx(
                     "flex items-center justify-between py-4 px-5",
-                    { "text-blue-600 font-semibold": checked }
+                    { "text-blue-600 font-semibold": checked },
+                    { "border-b border-stone-300": selectable && checked }
                   )}
                 >
                   <span>{label}</span>
@@ -108,7 +180,6 @@ const SelectTarget = () => {
                     leaveTo="h-[0px] opacity-0"
                     className="overflow-y-scroll"
                   >
-                    <div className="border-t"></div>
                     <SelectList
                       options={
                         value === "juz"
@@ -121,8 +192,16 @@ const SelectTarget = () => {
                               label: name,
                             }))
                       }
-                      value={1}
-                      onChange={() => {}}
+                      selectedValues={
+                        value === "all"
+                          ? []
+                          : value === "juz"
+                          ? state.selectedJuz
+                          : state.selectedSurah
+                      }
+                      onChange={(selected, sentValue) => {
+                        handleSelectedValuesChange(value, selected, sentValue);
+                      }}
                     />
                   </Transition>
                 )}
