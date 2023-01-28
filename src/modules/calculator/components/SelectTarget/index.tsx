@@ -3,9 +3,51 @@ import { targetTypeOptions } from "@/calculator/utils/constants";
 import { RadioGroup, Transition } from "@headlessui/react";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
+import SelectList from "../SelectList";
+import { Juz, Surah } from "@/modules/core/QuranCoreData/constant";
+
+type SelectTargetState = {
+  selectedType: string;
+  selectedJuz: string[];
+  selectedSurah: string[];
+};
+
+type SelectTargetAction = {
+  type: SelectTargetActions;
+  payload: any;
+};
+
+enum SelectTargetActions {
+  SELECT_TYPE_ALL_QURAN = "SELECT_ALL_QURAN",
+  SELECT_TYPE_JUZ = "SELECT_TYPE_JUZ",
+  SELECT_TYPE_SURAH = "SELECT_TYPE_SURAH",
+  SELECT_ALL_JUZ = "SELECT_ALL_JUZ",
+  SELECT_JUZ = "SELECT_JUZ",
+  DESELECT_JUZ = "DESELECT_JUZ",
+  SELECT_ALL_SURAH = "SELECT_ALL_SURAH",
+  SELECT_SURAH = "SELECT_SURAH",
+  DESELECT_SURAH = "DESELECT_SURAH",
+}
+
+const SelectTargetReducer = (
+  state: SelectTargetState,
+  action: SelectTargetAction
+): SelectTargetState => {
+  switch (action.type) {
+    default:
+      return state;
+  }
+};
+
+const initialSelectTargetState: SelectTargetState = {
+  selectedType: targetTypeOptions[0].value,
+  selectedJuz: [],
+  selectedSurah: [],
+};
 
 const SelectTarget = () => {
   const [selectedType, setSelectedType] = useState(targetTypeOptions[0].value);
+  //   const [state, dispatch] = useReducer()
   const R = RadioGroup;
   return (
     <div className="mt-6">
@@ -48,9 +90,24 @@ const SelectTarget = () => {
                     leave="transition-all duration-300"
                     leaveFrom="h-[200px] opacity-100"
                     leaveTo="h-[0px] opacity-0"
+                    className="overflow-y-scroll"
                   >
                     <div className="border-t"></div>
-                    {/* Must Select */}
+                    <SelectList
+                      options={
+                        value === "juz"
+                          ? Juz.map(({ id, label }) => ({
+                              value: id,
+                              label,
+                            }))
+                          : Surah.map(({ id, name }) => ({
+                              value: id,
+                              label: name,
+                            }))
+                      }
+                      value={1}
+                      onChange={() => {}}
+                    />
                   </Transition>
                 )}
               </div>

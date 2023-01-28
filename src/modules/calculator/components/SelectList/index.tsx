@@ -1,8 +1,9 @@
+import clsx from "clsx";
+
 const SelectList = ({
   options,
   value,
   onChange,
-  renderItem,
 }: {
   options: {
     value: string;
@@ -10,19 +11,23 @@ const SelectList = ({
   }[];
   value: string | number;
   onChange: (value: string | number) => void;
-  renderItem: ({}) => JSX.Element;
 }) => {
   const selected = value;
   return (
-    <div>
-      {options.map(({ value, label }: { value: string; label: string }) =>
-        renderItem({
-          value,
-          label,
-          checked: value === selected,
-          onChange: () => onChange(value),
-        })
-      )}
+    <div className="p-2">
+      {options.map((item) => {
+        const { value, label } = item;
+        return (
+          <div
+            key={value}
+            className={clsx(
+              "transition-all p-2 border mb-2 rounded hover:border-stone-400"
+            )}
+          >
+            {label}
+          </div>
+        );
+      })}
     </div>
   );
 };
