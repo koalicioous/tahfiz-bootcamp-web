@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useReducer } from "react";
 import { targetTypeOptions } from "@/calculator/utils/constants";
 import { RadioGroup, Transition } from "@headlessui/react";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
@@ -18,9 +18,7 @@ type SelectTargetAction = {
 };
 
 enum SelectTargetActions {
-  SELECT_TYPE_ALL_QURAN = "SELECT_ALL_QURAN",
-  SELECT_TYPE_JUZ = "SELECT_TYPE_JUZ",
-  SELECT_TYPE_SURAH = "SELECT_TYPE_SURAH",
+  SELECT_TYPE = "SELECT_TYPE",
   SELECT_ALL_JUZ = "SELECT_ALL_JUZ",
   SELECT_JUZ = "SELECT_JUZ",
   DESELECT_JUZ = "DESELECT_JUZ",
@@ -34,6 +32,13 @@ const SelectTargetReducer = (
   action: SelectTargetAction
 ): SelectTargetState => {
   switch (action.type) {
+    case SelectTargetActions.SELECT_TYPE:
+      return {
+        ...state,
+        ...action.payload,
+        selectedJuz: [],
+        selectedSurah: [],
+      };
     default:
       return state;
   }
@@ -46,12 +51,23 @@ const initialSelectTargetState: SelectTargetState = {
 };
 
 const SelectTarget = () => {
-  const [selectedType, setSelectedType] = useState(targetTypeOptions[0].value);
-  //   const [state, dispatch] = useReducer()
+  const [state, dispatch] = useReducer(
+    SelectTargetReducer,
+    initialSelectTargetState
+  );
   const R = RadioGroup;
+
   return (
     <div className="mt-6">
-      <R value={selectedType} onChange={setSelectedType}>
+      <R
+        value={state.selectedType}
+        onChange={(e: string) => {
+          dispatch({
+            type: SelectTargetActions.SELECT_TYPE,
+            payload: { selectedType: e },
+          });
+        }}
+      >
         {targetTypeOptions.map(({ value, label, selectable = false }) => (
           <R.Option value={value} key={value}>
             {({ checked }) => (
