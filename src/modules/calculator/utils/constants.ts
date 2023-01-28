@@ -6,9 +6,11 @@ export const targetTypeOptions = [
   {
     value: "juz",
     label: "Pilih Juz",
+    selectable: true,
   },
   {
     value: "surah",
     label: "Pilih Surah",
+    selectable: true,
   },
 ];
