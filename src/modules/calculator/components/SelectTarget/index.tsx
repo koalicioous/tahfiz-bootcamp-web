@@ -220,7 +220,10 @@ const SelectTarget = () => {
                 className={clsx(
                   "transition-all border rounded-md mt-2 cursor-pointer hover:shadow text-sm ",
                   { "border-blue-400 bg-white": checked },
-                  { "hover:border-blue-200": !checked }
+                  {
+                    "hover:border-blue-200 hover:bg-white hover:font-medium":
+                      !checked,
+                  }
                 )}
               >
                 <div
@@ -345,6 +348,25 @@ const SelectTarget = () => {
           </R.Option>
         ))}
       </R>
+      <div className="mt-4 h-[42px]">
+        <Transition
+          show={
+            selectedType === "all" ||
+            (selectedType === "surah" && selectedSurah.length > 0) ||
+            (selectedType === "juz" && selectedJuz.length > 0)
+          }
+          enter="transition-all duration-300"
+          enterFrom="opacity-0 transform translate-y-2"
+          enterTo="opacity-100 transform translate-y-0"
+          leave="transition-all duration-300"
+          leaveFrom="opacity-100 transform translate-y-0"
+          leaveTo="opacity-0 transform translate-y-2"
+        >
+          <button className="bg-blue-500 w-full py-2 rounded text-white font-medium border border-blue-400">
+            Selanjutnya
+          </button>
+        </Transition>
+      </div>
     </div>
   );
 };
