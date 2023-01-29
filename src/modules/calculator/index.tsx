@@ -1,6 +1,11 @@
+import { Transition } from "@headlessui/react";
+import { useState } from "react";
 import SelectTarget from "./components/SelectTarget";
 
+const steps = ["target", "duration", "result"];
+
 const Calculator = () => {
+  const [step, setStep] = useState(steps[0]);
   return (
     <div>
       <div className="text-center">
@@ -9,7 +14,18 @@ const Calculator = () => {
         </h1>
       </div>
       <div>
-        <SelectTarget />
+        <Transition
+          appear
+          show={step === "target"}
+          enter="transition-opacity duration-300"
+          enterFrom="opacity-0 -translate-y-2"
+          enterTo="opacity-100 translate-y-0"
+          leave="transition-opacity duration-300"
+          leaveFrom="opacity-100 translate-y-0"
+          leaveTo="opacity-0 -translate-y-2"
+        >
+          <SelectTarget />
+        </Transition>
       </div>
     </div>
   );
