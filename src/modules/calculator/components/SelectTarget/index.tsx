@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useReducer, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import { targetTypeOptions } from "@/calculator/utils/constants";
 import { RadioGroup, Transition } from "@headlessui/react";
 import {
@@ -102,7 +109,11 @@ const initialSelectTargetState: SelectTargetState = {
   selectedSurah: [],
 };
 
-const SelectTarget = () => {
+const SelectTarget = ({
+  setStep,
+}: {
+  setStep: Dispatch<SetStateAction<string>>;
+}) => {
   const [increaseAnimation, setIncreaseAnimation] = useState(false);
   const [decreaseAnimation, setDecreaseAnimation] = useState(false);
   const [state, dispatch] = useReducer(
@@ -362,7 +373,10 @@ const SelectTarget = () => {
           leaveFrom="opacity-100 transform translate-y-0"
           leaveTo="opacity-0 transform translate-y-2"
         >
-          <button className="bg-blue-500 w-full py-2 rounded text-white font-medium border border-blue-400">
+          <button
+            onClick={() => setStep("duration")}
+            className="bg-blue-500 w-full py-2 rounded text-white font-medium border border-blue-400"
+          >
             Selanjutnya
           </button>
         </Transition>
