@@ -313,7 +313,7 @@ const SelectTarget = () => {
                     enter="transition-all duration-500"
                     enterFrom="h-[0px] opacity-0"
                     enterTo="h-[200px] opacity-100"
-                    leave="transition-all duration-300"
+                    leave="transition-all duration-500"
                     leaveFrom="h-[200px] opacity-100"
                     leaveTo="h-[0px] opacity-0"
                     className="overflow-y-scroll"
